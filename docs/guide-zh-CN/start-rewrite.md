@@ -43,7 +43,34 @@ location /
      #autoindex  on;
 }
 ```
-
+包含其他参数
+```
+server {
+	listen       80;
+            server_name   www.pt.com; #这里是站点hosts自己修改
+            root   "/Users/baishaojie/rageframe2/web";#这里是指向自己项目的web目录 修改为自己的绝对路径
+			location / {
+				index index.html index.htm index.php;
+				if (!-e $request_filename) {
+					rewrite ^/backend(.*)$ /backend/index.php?s=$1 last;
+								rewrite ^/wechat(.*)$ /wechat/index.php?s=$1 last;
+								rewrite ^/api(.*)$ /api/index.php?s=$1 last;
+								rewrite ^/(.*)$ /index.php?s=$1 last;
+						break;
+				}
+				#autoindex on;
+			}
+			location ~ \.php(.*)$ {
+				fastcgi_pass 127.0.0.1:9000;
+					fastcgi_index index.php;
+					fastcgi_split_path_info ^((?U).+\.php)(/?.+)$;
+					fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+					fastcgi_param PATH_INFO $fastcgi_path_info;
+					fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;
+					include fastcgi_params;
+			}
+}
+```
 ### Apache
 
 > 注意系统默认自带了.htaccess，所以环境如果是apache可以不用再配置
